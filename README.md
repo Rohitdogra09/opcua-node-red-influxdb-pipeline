@@ -1,12 +1,14 @@
-# 🚀 OPC UA → Node-RED → InfluxDB Pipeline
+# 🚀 OPC UA → Node-RED → InfluxDB Industrial Data Pipeline
 
-This project demonstrates a real-time industrial data pipeline that retrieves machine data from an OPC UA server, processes it using Node-RED, and stores it in InfluxDB for time-series analysis.
+This project demonstrates a **real-time industrial data pipeline** that retrieves machine data from an OPC UA server, processes it using Node-RED, and stores it in InfluxDB for time-series analysis.
+
+It is designed as part of a **Cyber-Physical Systems (CPS)** workflow for machine monitoring, analytics, and future predictive maintenance.
 
 ---
 
 ## 📊 Architecture Overview
 
-OPC UA Server → Node-RED (Processing) → InfluxDB (Storage)
+OPC UA Server → Node-RED (Processing) → InfluxDB (Storage) → Grafana (Visualization & Alerts)
 
 ---
 
@@ -16,17 +18,19 @@ OPC UA Server → Node-RED (Processing) → InfluxDB (Storage)
 * Node-RED
 * OPC UA Protocol
 * InfluxDB (v2.x)
+* Grafana
 * JavaScript (Function Node)
 
 ---
 
-## 🧠 Features
+## 🧠 Key Features
 
-* Subscription-based OPC UA data acquisition
-* Real-time data processing using Node-RED
-* Filtering invalid values (NaN/null handling)
-* Structured data storage in InfluxDB
-* Scalable architecture for industrial CPS systems
+* 🔄 Subscription-based OPC UA data acquisition
+* ⚡ Real-time data processing using Node-RED
+* 🧹 Data cleaning and validation (NaN/null filtering)
+* 🗄️ Structured storage in InfluxDB (time-series database)
+* 📊 Grafana dashboard for real-time visualization
+* 🚨 Alert system for monitoring thresholds and conditions
 
 ---
 
@@ -81,7 +85,10 @@ http://127.0.0.1:1880
 ### 3️⃣ Install Required Node-RED Packages
 
 In Node-RED:
-Menu → Manage Palette → Install:
+
+* Menu → Manage Palette → Install
+
+Install:
 
 * node-red-contrib-opcua
 * node-red-contrib-influxdb
@@ -93,22 +100,22 @@ Menu → Manage Palette → Install:
 * Open Node-RED
 * Menu → Import
 * Paste contents of `flows.json`
-* Deploy
+* Click **Deploy**
 
 ---
 
 ## 🔌 OPC UA Configuration
 
 * Add multiple **OPC UA Item** nodes
-* Connect to **OPC UA Client**
+* Connect them to **OPC UA Client**
 * Set mode to:
-  ✅ **Subscription (recommended)**
+  ✅ **Subscription (recommended for real-time data)**
 
-Example data points:
+Example machine parameters:
 
-* Spindle speed
-* Axis current
-* Feed rate
+* Spindle Speed
+* Axis Current
+* Feed Rate
 * Torque
 * Power
 
@@ -116,19 +123,32 @@ Example data points:
 
 ## 🧮 Function Node Logic
 
-The function node:
+The function node performs:
 
-* Converts values to numbers
-* Filters invalid values
-* Builds structured payload for InfluxDB
+* Conversion of incoming values to numeric format
+* Filtering invalid values (null/NaN)
+* Structuring data for InfluxDB
 
-Key logic:
+Example:
 
 ```javascript
 function toNum(v) {
     const n = (typeof v === "string") ? Number(v.trim()) : Number(v);
     return Number.isFinite(n) ? n : null;
 }
+
+const fields = {
+    actSpeed: toNum(msg.payload["..."]),
+    driveLoad: toNum(msg.payload["..."])
+};
+
+// Remove null values
+msg.payload = {};
+for (const [k, v] of Object.entries(fields)) {
+    if (v !== null) msg.payload[k] = v;
+}
+
+return msg;
 ```
 
 ---
@@ -140,7 +160,7 @@ function toNum(v) {
 Download:
 https://www.influxdata.com/
 
-Run InfluxDB server:
+Start InfluxDB:
 
 ```bash
 influxd
@@ -171,17 +191,42 @@ http://localhost:8086
 
 ---
 
+## 📊 Grafana Integration
+
+* Connect Grafana to InfluxDB
+* Create dashboards for machine monitoring
+* Visualize:
+
+  * Speed
+  * Torque
+  * Power
+  * Feed rate
+
+---
+
+## 🚨 Alert System
+
+* Configure alerts in Grafana
+* Define thresholds for machine parameters
+* Enable notifications for abnormal conditions
+
+---
+
 ## 🔐 Security Note
 
 ⚠️ This is a demo project.
 
 Do NOT expose:
 
-* OPC UA endpoint publicly
+* OPC UA endpoints
 * InfluxDB tokens
 * Internal machine data
 
-Use environment variables for production.
+For production:
+
+* Use environment variables
+* Secure API tokens
+* Use VPN or internal networks
 
 ---
 
@@ -189,18 +234,20 @@ Use environment variables for production.
 
 1. OPC UA Client subscribes to machine data
 2. Data is collected in Node-RED
-3. Join node aggregates values
-4. Function node cleans & formats data
-5. InfluxDB node writes data to time-series database
+3. Join node aggregates multiple signals
+4. Function node cleans and formats data
+5. InfluxDB stores time-series data
+6. Grafana visualizes and monitors the system
 
 ---
 
-## 📈 Future Improvements
+## 📈 Future Work
 
-* Add Grafana dashboard
-* Add alert system
-* Add anomaly detection (AI/ML)
-* Dockerize the pipeline
+* 🤖 **Machine Learning Integration**
+  Develop predictive maintenance models and anomaly detection using collected time-series data
+
+* 🐳 **Pipeline Containerization**
+  Dockerize the full system (Node-RED, OPC UA client, InfluxDB) for scalable and portable deployment
 
 ---
 
@@ -213,6 +260,6 @@ Deggendorf Institute of Technology
 
 ---
 
-## ⭐ If you like this project
+## ⭐ Support
 
-Give it a star ⭐ on GitHub!
+If you like this project, give it a ⭐ on GitHub!
