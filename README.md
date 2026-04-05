@@ -151,9 +151,10 @@ Download:
 https://www.influxdata.com/
 
 Start InfluxDB:
+open command prompt and go to the path of influxdb file and then open using command: 
 
 ```bash
-influxd
+.\influxd.exe
 ```
 
 Open UI:
