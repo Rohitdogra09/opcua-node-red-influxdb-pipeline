@@ -34,16 +34,6 @@ OPC UA Server → Node-RED (Processing) → InfluxDB (Storage) → Grafana (Visu
 
 ---
 
-## 📷 Screenshots
-
-### Node-RED Flow
-
-![Flow](screenshots/flow.png)
-
-### Function Node Logic
-
-![Function](screenshots/function_node.png)
-
 ---
 
 ## 🛠️ Setup Guide
